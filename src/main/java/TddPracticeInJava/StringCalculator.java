@@ -13,7 +13,7 @@ public class StringCalculator {
         }
 
         String delimiter = parseDelimiter(input);
-        String numbersStr = extractNumbersString(input);
+        String numbersStr = extractNumbersString(input, delimiter);
 
         String[] numbers = splitNumbers(numbersStr, delimiter);
         List<Integer> validNumbers = extractValidNumbers(numbers);
@@ -26,7 +26,7 @@ public class StringCalculator {
     private String parseDelimiter(String input) {
         String delimiter = ",|\n";
         if (input.startsWith("//")) {
-            Matcher matcher = Pattern.compile("//(.*?)\n").matcher(input);
+            Matcher matcher = Pattern.compile("//\\[(.*?)\\]\n").matcher(input);
             if (matcher.find()) {
                 delimiter = Pattern.quote(matcher.group(1));
             }
@@ -34,12 +34,12 @@ public class StringCalculator {
         return delimiter;
     }
 
-    private String extractNumbersString(String input) {
+    private String extractNumbersString(String input, String delimiter) {
         String numbersStr = input;
         if (input.startsWith("//")) {
             numbersStr = input.substring(input.indexOf("\n") + 1);
         }
-        return numbersStr;
+        return numbersStr.replaceAll("\\[.*?]", delimiter);
     }
 
     private String[] splitNumbers(String numbersStr, String delimiter) {
