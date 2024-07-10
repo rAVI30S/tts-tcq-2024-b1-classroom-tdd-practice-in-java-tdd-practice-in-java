@@ -26,7 +26,7 @@ public class StringCalculator {
     private String parseDelimiter(String input) {
         String delimiter = ",|\n";
         if (input.startsWith("//")) {
-            Matcher matcher = Pattern.compile("//\\[(.*?)\\]\n").matcher(input);
+            Matcher matcher = Pattern.compile("//(.*?)\n").matcher(input);
             if (matcher.find()) {
                 delimiter = Pattern.quote(matcher.group(1));
             }
