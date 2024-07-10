@@ -5,47 +5,73 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
+public int add(String input) {
+    if (input.isEmpty()) {
+        return 0;
+    }
 
-    public int add(String input) {
-        if (input.isEmpty()) {
-            return 0;
+    String delimiter = parseDelimiter(input);
+    String numbersStr = extractNumbersString(input);
+
+    String[] numbers = splitNumbers(numbersStr, delimiter);
+    List<Integer> validNumbers = extractValidNumbers(numbers);
+
+    handleNegatives(validNumbers);
+
+    return calculateSum(validNumbers);
+}
+
+private String parseDelimiter(String input) {
+    String delimiter = ",|\n";
+    if (input.startsWith("//")) {
+        Matcher matcher = Pattern.compile("//(.*?)\n").matcher(input);
+        if (matcher.find()) {
+            delimiter = Pattern.quote(matcher.group(1));
         }
+    }
+    return delimiter;
+}
 
-        // Default delimiter is comma or newline
-        String delimiter = ",|\n";
-        String numbersStr = input;
+private String extractNumbersString(String input) {
+    String numbersStr = input;
+    if (input.startsWith("//")) {
+        numbersStr = input.substring(input.indexOf("\n") + 1);
+    }
+    return numbersStr;
+}
 
-        // Check if custom delimiter is specified
-        if (input.startsWith("//")) {
-            // Extract delimiter
-            Matcher matcher = Pattern.compile("//(.*?)\n").matcher(input);
-            if (matcher.find()) {
-                delimiter = Pattern.quote(matcher.group(1));
-                numbersStr = input.substring(input.indexOf("\n") + 1);
-            }
+private String[] splitNumbers(String numbersStr, String delimiter) {
+    return numbersStr.split(delimiter);
+}
+
+private List<Integer> extractValidNumbers(String[] numbers) {
+    List<Integer> validNumbers = new ArrayList<>();
+    for (String num : numbers) {
+        int n = Integer.parseInt(num);
+        if (n <= 1000) {
+            validNumbers.add(n);
         }
+    }
+    return validNumbers;
+}
 
-        // Split the numbers using delimiter
-        String[] numbers = numbersStr.split(delimiter);
-
-        // Handle negatives and sum calculation
-        List<Integer> negatives = new ArrayList<>();
-        int sum = 0;
-        for (String num : numbers) {
-            int n = Integer.parseInt(num);
-            if (n < 0) {
-                negatives.add(n);
-            } else if (n <= 1000) {
-                sum += n;
-            }
+private void handleNegatives(List<Integer> numbers) {
+    List<Integer> negatives = new ArrayList<>();
+    for (int num : numbers) {
+        if (num < 0) {
+            negatives.add(num);
         }
-
-        // Throw exception for negatives
-        if (!negatives.isEmpty()) {
-            throw new IllegalArgumentException("Negatives not allowed: " + negatives);
-        }
-
-        return sum;
+    }
+    if (!negatives.isEmpty()) {
+        throw new IllegalArgumentException("Negatives not allowed: " + negatives);
     }
 }
 
+private int calculateSum(List<Integer> numbers) {
+    int sum = 0;
+    for (int num : numbers) {
+        sum += num;
+    }
+    return sum;
+}
+}
